@@ -70,5 +70,3 @@ activeTile = Color green $ rectangleSolid tileSize tileSize
 gridTile :: Bool -> Picture
 gridTile True = activeTile
 gridTile False = emptyTile
-
-sum' a b = a + b * 2
