@@ -17,7 +17,7 @@ main = let window = InWindow "TronBot" windowSize (0, 0)
        in play window black 1 initialGrid drawGrid inputHandler (\_ world -> world)
 
 initialGrid :: Grid
-initialGrid = Grid (gridTiles startPos) startPos
+initialGrid = newGrid startPos
 
 drawGrid :: Grid -> Picture
 drawGrid (Grid {tiles = t}) = Pictures t
@@ -28,11 +28,11 @@ inputHandler _ grid = grid
 
 move :: SpecialKey -> Grid -> Grid
 move key (Grid {active = (x, y)})
-    | key == KeyDown = Grid (gridTiles (x, y - 1)) (x, y - 1)
-    | key == KeyUp = Grid (gridTiles (x, y + 1)) (x, y + 1)
-    | key == KeyLeft = Grid (gridTiles (x - 1, y)) (x - 1, y)
-    | key == KeyRight = Grid (gridTiles (x + 1, y)) (x + 1, y)
-    | otherwise = Grid (gridTiles (x, y)) (x, y)
+    | key == KeyDown    = newGrid (x, y-1)
+    | key == KeyUp      = newGrid (x, y+1)
+    | key == KeyLeft    = newGrid (x-1, y)
+    | key == KeyRight   = newGrid (x+1, y)
+    | otherwise         = newGrid (x, y)
 
 -- TODO move below to common.hs
 mapTuple2 :: (a -> b) -> (a, a) -> (b, b)
@@ -42,6 +42,9 @@ mapTuple2 f (a1, a2) = (f a1, f a2)
 data Grid = Grid { tiles :: [Picture]
                  , active :: (Int, Int)
                  }
+
+newGrid :: (Int, Int) -> Grid
+newGrid active = Grid (gridTiles active) active
 
 posToIndex :: (Float, Float) -> (Int, Int)
 posToIndex = mapTuple2 (\pos -> round $ pos / tileSize)
