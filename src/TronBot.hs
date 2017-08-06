@@ -1,3 +1,4 @@
+module TronBot where
 
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
@@ -41,7 +42,7 @@ mapTuple2 f (a1, a2) = (f a1, f a2)
 -- TODO move below to grid.hs
 data Grid = Grid { tiles :: [Picture]
                  , active :: (Int, Int)
-                 }
+                 } deriving(Eq, Show)
 
 newGrid :: (Int, Int) -> Grid
 newGrid active = Grid (gridTiles active) active
@@ -69,3 +70,5 @@ activeTile = Color green $ rectangleSolid tileSize tileSize
 gridTile :: Bool -> Picture
 gridTile True = activeTile
 gridTile False = emptyTile
+
+sum' a b = a + b * 2
