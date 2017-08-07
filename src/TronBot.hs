@@ -24,6 +24,17 @@ main :: IO ()
 main = let window = InWindow "TronBot" windowSize (0, 0)
        in play window black fps initialGrid drawGrid inputHandler frameHandler
 
+data State = State { grid :: Grid
+                   , currentPos :: (Int, Int)
+                   , lastP :: (Int, Int)
+                   , nextDirection :: Direction
+                   }
+
+data Direction = Up' | Down' | Left' | Right'
+
+initialState :: State
+initialState = State initialGrid startPos startPos Up'
+
 initialGrid :: Grid
 initialGrid = newGrid startPos startPos
 
