@@ -14,7 +14,8 @@ data Tile = Tile {
 data Grid = Grid {
   _tiles    :: [Picture],
   _active   :: Tile,
-  _lastPos  :: Tile
+  _lastPos  :: Tile,
+  _nextPos  :: Tile
 } deriving (Eq, Show)
 
 data Direction = Up' | Down' | Left' | Right'
@@ -57,22 +58,28 @@ frameHandler :: Float -> Grid -> Grid
 frameHandler _ grid@(Grid _
                      act@(Tile ax ay)
                      (Tile lx ly)
-                     ) = newGrid newPos (ax, ay)
-                     where newPos = (nextPos ax lx gridWidth,
-                                     nextPos ay ly gridHeight)
+                     next@(Tile nx ny)
+                     )
+                     | next == act    = newGrid defNewPos (ax, ay)
+                     | otherwise      = newGrid (nx, ny) (ax, ay)
+                     where defNewPos = (defaultNextPos ax lx gridWidth,
+                                        defaultNextPos ay ly gridHeight)
 
-nextPos :: Int -> Int -> Int -> Int
-nextPos curPos oldPos limit
+defaultNextPos :: Int -> Int -> Int -> Int
+defaultNextPos curPos oldPos limit
   | 0 <= newPos && newPos < limit   = newPos
   | otherwise                       = curPos
   where newPos = curPos + (curPos - oldPos)
 
+-- this function does not update the visuals of the grid, only the positions
+-- visuals are updated when framehandler is called
 move :: SpecialKey -> Grid -> Grid
-move key grid@(Grid _ act@(Tile ax ay) (Tile lx ly))
-    | key == KeyDown  && (abs ay - ly) /= 1  && ay > 0            = grid & active.y -~ 1 & lastPos .~ act
-    | key == KeyUp    && (abs ay - ly) /= 1  && ay < gridHeight-1 = grid & active.y +~ 1 & lastPos .~ act
-    | key == KeyLeft  && (abs ax - lx) /= 1  && ax > 0            = grid & active.x -~ 1 & lastPos .~ act
-    | key == KeyRight && (abs ax - lx) /= 1  && ax < gridWidth-1  = grid & active.x +~ 1 & lastPos .~ act
+move key grid@(Grid _ act@(Tile ax ay) (Tile lx ly) next)
+    | act /= next                                                 = grid
+    | key == KeyDown  && (abs ay - ly) /= 1  && ay > 0            = grid & nextPos.y -~ 1
+    | key == KeyUp    && (abs ay - ly) /= 1  && ay < gridHeight-1 = grid & nextPos.y +~ 1
+    | key == KeyLeft  && (abs ax - lx) /= 1  && ax > 0            = grid & nextPos.x -~ 1
+    | key == KeyRight && (abs ax - lx) /= 1  && ax < gridWidth-1  = grid & nextPos.x +~ 1
     | otherwise                                                   = grid
 
 -- TODO move below to common.hs
@@ -80,9 +87,8 @@ mapTuple2 :: (a -> b) -> (a, a) -> (b, b)
 mapTuple2 f (a1, a2) = (f a1, f a2)
 
 -- TODO move below to grid.hs
-
 newGrid :: (Int, Int) -> (Int, Int) -> Grid
-newGrid active lastPos = Grid (gridTiles activeTile) activeTile lastPosTile
+newGrid active lastPos = Grid (gridTiles activeTile) activeTile lastPosTile activeTile
                          where activeTile  = newTile active
                                lastPosTile = newTile lastPos
 
