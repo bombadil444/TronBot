@@ -25,13 +25,13 @@ movetest4 = "move" ~: "should set nextPos right when right key pressed"
 -----------------------------------------------------------------------------------
 
 fhtest1 = "framehandler" ~: "should move active to next tile"
-    ~: frameHandler 1 (newGrid (10, 10) (10, 9))^.active ~=? newTile(10, 11)
+    ~: frameHandler 1 (newGrid initialTiles (10, 10) (10, 9))^.active ~=? newTile(10, 11) True
 
 fhtest2 = "framehandler" ~: "should set lastPos to the previous active tile"
-    ~: frameHandler 1 (newGrid (10, 10) (10, 9))^.lastPos ~=? newTile(10, 10)
+    ~: frameHandler 1 (newGrid initialTiles (10, 10) (10, 9))^.lastPos ~=? newTile(10, 10) True
 
 fhtest3 = "framehandler" ~: "should reset nextPos to the current active tile"
-    ~: frameHandler 1 (newGrid (10, 10) (10, 9))^.nextPos ~=? newTile(10, 11)
+    ~: frameHandler 1 (newGrid initialTiles (10, 10) (10, 9))^.nextPos ~=? newTile(10, 11) True
 
 -----------------------------------------------------------------------------------
 
