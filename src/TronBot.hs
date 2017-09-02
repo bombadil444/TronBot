@@ -18,8 +18,6 @@ data Grid = Grid {
   _nextPos  :: Tile
 } deriving (Eq, Show)
 
-data Direction = Up' | Down' | Left' | Right'
-
 makeLenses ''Grid
 makeLenses ''Tile
 
@@ -62,8 +60,8 @@ frameHandler _ grid@(Grid _
                      )
                      | next == act    = newGrid defNewPos (ax, ay)
                      | otherwise      = newGrid (nx, ny) (ax, ay)
-                     where defNewPos = (defaultNextPos ax lx gridWidth,
-                                        defaultNextPos ay ly gridHeight)
+                     where defNewPos  = (defaultNextPos ax lx gridWidth,
+                                         defaultNextPos ay ly gridHeight)
 
 defaultNextPos :: Int -> Int -> Int -> Int
 defaultNextPos curPos oldPos limit
