@@ -30,8 +30,6 @@ margin = 50
 startPos = (20, 20)
 fps = 15
 
-blockedTiles = []
-
 windowSize :: (Int, Int)
 windowSize = (round gridSizeX + margin, round gridSizeY + margin)
 
@@ -61,8 +59,8 @@ frameHandler _ grid@(Grid tiles
                      (Tile lx ly _)
                      next@(Tile nx ny _)
                      )
-                     | next == act    = newGrid tiles defNewPos (ax, ay)
-                     | otherwise      = newGrid tiles (nx, ny) (ax, ay)
+                     | next == act   = newGrid tiles defNewPos (ax, ay)
+                     | otherwise     = newGrid tiles (nx, ny) (ax, ay)
                      where defNewPos = (defaultNextPos ax lx gridWidth,
                                         defaultNextPos ay ly gridHeight)
 
@@ -89,12 +87,10 @@ mapTuple2 f (a1, a2) = (f a1, f a2)
 
 -- TODO move below to grid.hs
 newGrid :: [Tile] -> (Int, Int) -> (Int, Int) -> Grid
-newGrid tiles active lastPos = Grid (tiles++[activeTile]) activeTile lastPosTile activeTile
-                         where activeTile  = newTile active True
-                               lastPosTile = newTile lastPos True
-
-posToTile :: (Float, Float) -> Bool -> Tile
-posToTile t a = newTile (posToIndex t) a
+newGrid tiles active lastPos = Grid (tiles++[actTile])
+                                    actTile lastTile actTile
+                                    where actTile  = newTile active True
+                                          lastTile = newTile lastPos True
 
 posToIndex :: (Float, Float) -> (Int, Int)
 posToIndex = mapTuple2 (\pos -> round $ pos / tileSize)
@@ -104,18 +100,18 @@ newTile (x, y) active = Tile x y active
 
 initialTiles :: [Tile]
 initialTiles = [ newTile (posToIndex (x * tileSize, y * tileSize)) False
-                  | x <- [0..(gridSizeX / tileSize) - 1 ]
-                  , y <- [0..(gridSizeY / tileSize) - 1 ] ]
+                 | x <- [0..(gridSizeX / tileSize) - 1 ]
+                 , y <- [0..(gridSizeY / tileSize) - 1 ] ]
 
 tilesToPics :: [Tile] -> [Picture]
 tilesToPics tiles = [ tileToPic tile | tile <- tiles ]
 
 tileToPic :: Tile -> Picture
 tileToPic tile@(Tile x y blocked) = Translate
-                  (offset (fromIntegral x) gridSizeX)
-                  (offset (fromIntegral y) gridSizeY)
-                  $ gridTile blocked
-                 where offset pos gridSize = pos * tileSize - gridSize / 2 + tileSize / 2
+    (offset (fromIntegral x) gridSizeX)
+    (offset (fromIntegral y) gridSizeY)
+    $ gridTile blocked
+    where offset pos gridSize = pos * tileSize - gridSize / 2 + tileSize / 2
 
 
 emptyTilePic :: Picture
