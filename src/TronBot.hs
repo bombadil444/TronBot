@@ -78,16 +78,12 @@ nextPos curPos oldPos limit
   where newPos = curPos + (curPos - oldPos)
 
 move :: SpecialKey -> Grid -> Grid
-move key grid
-    | key == KeyDown  && (abs ay - ly) /= 1  && ay > 0            = newGrid (ax, ay-1) (ax, ay) -- TODO use lens set instead
-    | key == KeyUp    && (abs ay - ly) /= 1  && ay < gridHeight-1 = newGrid (ax, ay+1) (ax, ay)
-    | key == KeyLeft  && (abs ax - lx) /= 1  && ax > 0            = newGrid (ax-1, ay) (ax, ay)
-    | key == KeyRight && (abs ax - lx) /= 1  && ax < gridWidth-1  = newGrid (ax+1, ay) (ax, ay)
+move key grid@(Grid _ act@(Tile ax ay) (Tile lx ly))
+    | key == KeyDown  && (abs ay - ly) /= 1  && ay > 0            = grid & active.y -~ 1 & lastPos .~ act-- TODO use lens set instead
+    | key == KeyUp    && (abs ay - ly) /= 1  && ay < gridHeight-1 = grid & active.y +~ 1 & lastPos .~ act
+    | key == KeyLeft  && (abs ax - lx) /= 1  && ax > 0            = grid & active.x -~ 1 & lastPos .~ act
+    | key == KeyRight && (abs ax - lx) /= 1  && ax < gridWidth-1  = grid & active.x +~ 1 & lastPos .~ act
     | otherwise                                                   = grid
-    where ax = grid^.active.x
-          ay = grid^.active.y
-          lx = grid^.lastPos.x
-          ly = grid^.lastPos.y
 
 -- TODO move below to common.hs
 mapTuple2 :: (a -> b) -> (a, a) -> (b, b)
